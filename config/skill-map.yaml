@@ -1,0 +1,55 @@
+# AIWA v2 - Skill Map Configuration
+# Maps intents and modifiers to sales skills from vendor/sales-skills
+
+always:
+  - tone-matching
+  - response-length-calibration
+  - compliance-handling
+  - fallback-gracefully
+
+by_intent:
+  greeting:
+    - building-rapport
+    - active-listening
+  product_inquiry:
+    - product-knowledge
+    - asking-effective-questions
+    - intent-detection
+  price_request:
+    - pricing-discussion-logic
+  negotiation:
+    - pricing-negotiation
+    - negotiation
+    - micro-commitment-stacking
+  objection:
+    - objection-recognition
+    - objection-handling
+  ready_to_buy:
+    - closing
+    - buying-signal-amplification
+  company_info:
+    - attachment-media-handling
+  complaint:
+    - negative-sentiment-de-escalation
+    - handoff-detection
+  off_topic:
+    - out-of-scope-request-handling
+  follow_up:
+    - follow-up-discipline
+    - ghost-recovery-sequences
+  qualification:
+    - lead-qualification-logic
+    - budget-extraction-qualification
+
+modifiers:
+  cross_sell_window:
+    - cross-sell-upsell-detection
+    - deal-upselling
+  stalled:
+    - ghost-recovery-sequences
+    - conversation-resurrection
+  high_value:
+    - decision-maker-identification
+    - scarcity-urgency-calibration
+
+max_skills_per_turn: 5

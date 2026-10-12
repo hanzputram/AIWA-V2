@@ -1,0 +1,3 @@
+[submodule "vendor/sales-skills"]
+	path = vendor/sales-skills
+	url = https://github.com/louisblythe/Sales-Skills.git

@@ -1,0 +1,23 @@
+{
+  "name": "@aiwa/db",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "migrate": "node --loader tsx src/migrate.ts",
+    "seed": "node --loader tsx src/seed.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "pg": "^8.12.0",
+    "drizzle-orm": "^0.33.0",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.24.0",
+    "@types/pg": "^8.11.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
+  }
+}

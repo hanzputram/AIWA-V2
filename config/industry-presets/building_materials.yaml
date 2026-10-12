@@ -1,0 +1,43 @@
+# AIWA v2 - Industry Preset: Bahan Bangunan & Material
+key: building_materials
+label: Bahan Bangunan & Material
+
+glossary:
+  dus: kemasan
+  roll: gulungan
+  sak: sak/zak
+  batang: batang
+  lembar: lembar
+
+complement_hints:
+  - "produk utama + perekat/pengikat"
+  - "produk utama + alat pemasangan"
+  - "produk utama + pelindung/aksesori"
+  - "kabel + pipa konduit + klem"
+  - "semen + pasir + kerikil"
+  - "cat + kuas + roller"
+
+qualification_questions:
+  - "Untuk proyek apa dan berapa luas/volumenya?"
+  - "Kapan barang dibutuhkan di lokasi?"
+  - "Apakah ada spesifikasi teknis tertentu?"
+  - "Pembelian rutin atau proyek satu kali?"
+
+escalate_topics:
+  - "struktur bangunan (perhitungan beban)"
+  - "klaim standar SNI di luar data produk"
+  - "instalasi listrik bertegangan tinggi"
+
+typical_stages:
+  - name: Tanya produk/harga
+    actions: [search_products, get_quote]
+  - name: Negosiasi volume
+    actions: [negotiate_price, suggest_related_products]
+  - name: Penawaran resmi
+    actions: [create_quote, send_company_profile]
+  - name: Follow-up pengiriman
+    actions: [handoff_to_human]
+
+opening_phrases:
+  - "Selamat {waktu}, ada yang bisa kami bantu untuk kebutuhan material?"
+  - "Halo! Kami siap membantu kebutuhan bahan bangunan Anda."

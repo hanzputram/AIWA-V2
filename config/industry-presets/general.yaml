@@ -1,0 +1,23 @@
+# AIWA v2 - Industry Preset: Umum (default)
+key: general
+label: Umum
+
+glossary: {}
+
+complement_hints:
+  - "produk utama + aksesori"
+  - "produk utama + suku cadang"
+
+qualification_questions:
+  - "Untuk kebutuhan apa?"
+  - "Berapa jumlah yang dibutuhkan?"
+  - "Kapan barang perlu tersedia?"
+
+escalate_topics:
+  - "klaim keamanan/keselamatan"
+  - "klaim medis"
+  - "masalah hukum"
+
+opening_phrases:
+  - "Selamat {waktu}! Ada yang bisa kami bantu?"
+  - "Halo! Silakan tanyakan produk yang Anda butuhkan."

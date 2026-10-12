@@ -1,0 +1,28 @@
+# AIWA v2 - Industry Preset: Kelistrikan
+key: electrical
+label: Kelistrikan & Instalasi
+
+glossary:
+  roll: gulungan kabel
+  pcs: pieces
+  set: set/paket
+  meter: meter
+
+complement_hints:
+  - "kabel + pipa konduit + klem kabel"
+  - "saklar + stop kontak + faceplate"
+  - "MCB + panel box + busbar"
+  - "lampu + fitting + ballast"
+
+qualification_questions:
+  - "Untuk instalasi baru atau renovasi?"
+  - "Berapa titik lampu dan stop kontak yang dibutuhkan?"
+  - "Kapan barang perlu dikirim?"
+
+escalate_topics:
+  - "perhitungan beban listrik"
+  - "sertifikasi dan standar PLN"
+  - "instalasi tegangan menengah/tinggi"
+
+opening_phrases:
+  - "Selamat {waktu}! Butuh material elektrikal? Kami siap membantu."
