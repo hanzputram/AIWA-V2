@@ -251,11 +251,15 @@ function DashboardPage({
   conversations = [],
   unreadCount = 0,
   onSelectChat,
+  sessionStatus = "disconnected",
+  qrCodeData = null,
 }: {
   onNavigate?: (page: string) => void;
   conversations?: any[];
   unreadCount?: number;
   onSelectChat?: (phone: string) => void;
+  sessionStatus?: string;
+  qrCodeData?: string | null;
 }) {
   const recentConversations = conversations.slice(0, 6);
 
@@ -328,34 +332,75 @@ function DashboardPage({
       </div>
 
       {/* WhatsApp Playwright Connect Hero Banner */}
-      <div className="card p-4.5 bg-gradient-to-r from-emerald-50/90 via-white to-blue-50/50 border border-emerald-100/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
-        <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-[#075e54] text-white flex items-center justify-center shadow-xs shrink-0">
-            <QrCode className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h4 className="text-sm font-bold text-text-primary">Koneksi WhatsApp Web (Playwright)</h4>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Live Terhubung
-              </span>
+      {sessionStatus === "connected" ? (
+        <div className="card p-4.5 bg-gradient-to-r from-emerald-50/90 via-white to-blue-50/50 border border-emerald-100/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-[#075e54] text-white flex items-center justify-center shadow-xs shrink-0">
+              <QrCode className="w-5 h-5" />
             </div>
-            <p className="text-xs text-text-secondary mt-0.5">
-              WhatsApp nomor bisnis Anda terhubung via browser Chrome anti-deteksi dengan AI Auto-Sales aktif.
-            </p>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-sm font-bold text-text-primary">Koneksi WhatsApp Web (Playwright)</h4>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live Terhubung
+                </span>
+              </div>
+              <p className="text-xs text-text-secondary mt-0.5">
+                WhatsApp nomor bisnis Anda terhubung via browser Chrome anti-deteksi dengan AI Auto-Sales aktif.
+              </p>
+            </div>
           </div>
-        </div>
 
-        <button
-          onClick={() => onNavigate?.("playwright")}
-          className="btn-primary text-xs py-2 px-3.5 flex items-center gap-2 shrink-0 self-start sm:self-auto bg-[#075e54] hover:bg-[#128c7e]"
-        >
-          <Smartphone className="w-4 h-4" />
-          <span>Status WhatsApp & QR</span>
-          <ChevronRight className="w-3.5 h-3.5" />
-        </button>
-      </div>
+          <button
+            onClick={() => onNavigate?.("playwright")}
+            className="btn-primary text-xs py-2 px-3.5 flex items-center gap-2 shrink-0 self-start sm:self-auto bg-[#075e54] hover:bg-[#128c7e]"
+          >
+            <Smartphone className="w-4 h-4" />
+            <span>Kelola Sesi & Layar</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      ) : (
+        <div className="card p-4.5 bg-gradient-to-r from-amber-50/90 via-white to-orange-50/40 border border-amber-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
+          <div className="flex items-center gap-3.5">
+            {qrCodeData ? (
+              <img
+                src={qrCodeData}
+                alt="Scan WhatsApp QR"
+                className="w-16 h-16 rounded-lg border border-amber-300 shadow-2xs shrink-0 cursor-pointer object-contain bg-white p-1"
+                onClick={() => onNavigate?.("playwright")}
+                title="Klik untuk memperbesar QR Code"
+              />
+            ) : (
+              <div className="w-11 h-11 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs shrink-0">
+                <QrCode className="w-5 h-5" />
+              </div>
+            )}
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-sm font-bold text-text-primary">Koneksi WhatsApp Web Belum Terhubung</h4>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
+                  Perlu Scan QR Code
+                </span>
+              </div>
+              <p className="text-xs text-amber-900/80 mt-1">
+                Silakan scan kode QR dengan WhatsApp di HP Anda (Buka WhatsApp &rarr; Titik Tiga / Pengaturan &rarr; <strong>Perangkat Tertaut</strong>).
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => onNavigate?.("playwright")}
+            className="btn-primary text-xs py-2.5 px-4 flex items-center gap-2 shrink-0 self-start sm:self-auto bg-[#075e54] hover:bg-[#128c7e] text-white shadow-sm"
+          >
+            <QrCode className="w-4 h-4" />
+            <span>Pindai QR WhatsApp Sekarang</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Recent Conversations */}
@@ -4358,6 +4403,8 @@ export default function Home() {
   const [activePage, setActivePage] = useState("dashboard");
   const [conversations, setConversations] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [sessionStatus, setSessionStatus] = useState<string>("disconnected");
+  const [qrCodeData, setQrCodeData] = useState<string | null>(null);
   const [selectedChatPhone, setSelectedChatPhone] = useState<string | null>(null);
 
   // Sync real-time WhatsApp inbox data from API
@@ -4367,6 +4414,8 @@ export default function Home() {
       if (res.ok) {
         const data = await res.json();
         if (data.ok) {
+          if (data.status) setSessionStatus(data.status);
+          if (data.qrDataUrl !== undefined) setQrCodeData(data.qrDataUrl);
           if (Array.isArray(data.conversations)) {
             setConversations(data.conversations);
           }
@@ -4411,6 +4460,8 @@ export default function Home() {
             conversations={conversations}
             unreadCount={unreadCount}
             onSelectChat={handleSelectChat}
+            sessionStatus={sessionStatus}
+            qrCodeData={qrCodeData}
           />
         );
       case "playwright":
