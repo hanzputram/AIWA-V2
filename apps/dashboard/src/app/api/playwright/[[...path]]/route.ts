@@ -16,7 +16,7 @@ async function proxyRequest(
     const targetUrl = `${PLAYWRIGHT_BACKEND_URL}${targetPath}${search}`;
 
     const headers = new Headers();
-    request.headers.forEach((val, key) => {
+    request.headers.forEach((val: string, key: string) => {
       const lower = key.toLowerCase();
       if (!["host", "connection", "content-length"].includes(lower)) {
         headers.set(key, val);
@@ -39,7 +39,7 @@ async function proxyRequest(
     const resBody = await res.arrayBuffer();
 
     const responseHeaders = new Headers();
-    res.headers.forEach((val, key) => {
+    res.headers.forEach((val: string, key: string) => {
       const lower = key.toLowerCase();
       if (!["content-encoding", "transfer-encoding"].includes(lower)) {
         responseHeaders.set(key, val);

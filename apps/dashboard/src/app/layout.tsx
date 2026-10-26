@@ -1,8 +1,5 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+﻿import type { Metadata } from "next";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700", "800"] });
 
 export const metadata: Metadata = {
   title: "AIWA - AI Sales WhatsApp Platform",
@@ -16,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className={inter.className}>{children}</body>
+      <body className="antialiased font-sans">{children}</body>
     </html>
   );
 }

@@ -296,35 +296,81 @@ async function startSessionWatcher(sessionData) {
             } else {
                 // Not yet logged in: Check for QR Code canvas or reload button
                 try {
-                    // Check and auto-reload expired QR code if overlay button appears
+                    // 1. Auto-reload expired QR code if overlay button appears
                     await page.evaluate(() => {
-                        const qrContainer = document.querySelector('div[data-testid="qrcode"], div._akau, div._akav');
-                        if (qrContainer) {
-                            const btn = qrContainer.querySelector('button, [role="button"], span[data-icon="refresh"]') ||
-                                        Array.from(qrContainer.querySelectorAll('*')).find(el => /muat ulang|reload|click to reload|pindai ulang/i.test(el.innerText || ''));
-                            if (btn && btn.click) {
-                                btn.click();
-                            }
+                        const refreshCandidate = document.querySelector('div[data-testid="qrcode"] button, [data-ref] button, [data-ref] [role="button"], span[data-icon="refresh"], span[data-icon="reload"]') ||
+                            Array.from(document.querySelectorAll('button, div[role="button"], span')).find(el => {
+                                const text = (el.innerText || el.getAttribute('aria-label') || '').toLowerCase();
+                                return /muat ulang|reload|pindai ulang|click to reload/i.test(text);
+                            });
+                        if (refreshCandidate && typeof refreshCandidate.click === 'function') {
+                            refreshCandidate.click();
                         }
                     }).catch(() => {});
-                    await page.waitForTimeout(500);
+                    await page.waitForTimeout(300);
 
-                    const qrCanvas = await page.$('canvas');
-                    if (qrCanvas) {
-                        const dataUrl = await page.evaluate(() => {
-                            const canvas = document.querySelector('canvas');
-                            return canvas ? canvas.toDataURL('image/png') : null;
-                        });
-                        if (dataUrl) {
+                    // 2. Extract QR: Priority A native WhatsApp canvas, Priority B data-ref
+                    const qrResult = await page.evaluate(() => {
+                        // Priority A: Capture native WhatsApp Web canvas with pure white quiet-zone padding
+                        const canvas = document.querySelector('canvas');
+                        if (canvas && canvas.width > 50 && canvas.height > 50) {
+                            try {
+                                const margin = 20;
+                                const offscreen = document.createElement('canvas');
+                                offscreen.width = canvas.width + margin * 2;
+                                offscreen.height = canvas.height + margin * 2;
+                                const ctx = offscreen.getContext('2d');
+                                if (ctx) {
+                                    ctx.fillStyle = '#FFFFFF';
+                                    ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+                                    ctx.drawImage(canvas, margin, margin);
+                                    return { type: 'canvas', dataUrl: offscreen.toDataURL('image/png') };
+                                }
+                                return { type: 'canvas', dataUrl: canvas.toDataURL('image/png') };
+                            } catch (e) {}
+                        }
+
+                        // Priority B: Extract data-ref pairing string if canvas not rendered
+                        const refElement = document.querySelector('[data-ref]');
+                        if (refElement) {
+                            const rawRef = refElement.getAttribute('data-ref');
+                            if (rawRef && rawRef.trim().length > 10) {
+                                return { type: 'ref', ref: rawRef.trim() };
+                            }
+                        }
+
+                        return null;
+                    });
+
+                    if (qrResult) {
+                        let finalDataUrl = null;
+                        if (qrResult.type === 'canvas' && qrResult.dataUrl) {
+                            finalDataUrl = qrResult.dataUrl;
+                        } else if (qrResult.type === 'ref' && qrResult.ref) {
+                            // Standard Level 'L' error correction (low density, large modules) for rapid camera capture
+                            finalDataUrl = await QRCode.toDataURL(qrResult.ref, {
+                                margin: 4,
+                                width: 420,
+                                errorCorrectionLevel: 'L',
+                                color: {
+                                    dark: '#000000',
+                                    light: '#FFFFFF'
+                                }
+                            });
+                        } else if (qrResult.type === 'dataUrl') {
+                            finalDataUrl = qrResult.dataUrl;
+                        }
+
+                        if (finalDataUrl) {
                             sessionData.status = 'qr_ready';
-                            if (dataUrl !== sessionData.qrDataUrl) {
-                                sessionData.qrDataUrl = dataUrl;
-                                logger.info(`[PLAYWRIGHT] Captured QR code for session [${sessionId}]`);
+                            if (finalDataUrl !== sessionData.qrDataUrl) {
+                                sessionData.qrDataUrl = finalDataUrl;
+                                logger.info(`[PLAYWRIGHT] Captured QR code for session [${sessionId}] (source: ${qrResult.type})`);
                                 await sendToWebhook({
                                     event: 'qr_code',
                                     sessionId,
                                     provider: 'playwright',
-                                    qrDataUrl: dataUrl
+                                    qrDataUrl: finalDataUrl
                                 });
                             }
                         }
@@ -779,6 +825,46 @@ app.get('/sessions/:sessionId/status', (req, res) => {
         userPhone: sessionData.userPhone
     });
 });
+
+/**
+ * Force reload / refresh QR code on WhatsApp Web
+ */
+const handleReloadQr = async (req, res) => {
+    let { sessionId } = req.params;
+    sessionId = sessionId || 'default';
+    let sessionData = sessions.get(sessionId) || Array.from(sessions.values()).find(s => s.page && !s.page.isClosed());
+    if (!sessionData || !sessionData.page || sessionData.page.isClosed()) {
+        return res.status(404).json({ success: false, error: 'Sesi browser belum aktif.' });
+    }
+
+    try {
+        await sessionData.page.evaluate(() => {
+            const btn = document.querySelector('div[data-testid="qrcode"] button, [data-ref] button, [data-ref] [role="button"], span[data-icon="refresh"], span[data-icon="reload"]') ||
+                Array.from(document.querySelectorAll('button, div[role="button"], span')).find(el => {
+                    const text = (el.innerText || el.getAttribute('aria-label') || '').toLowerCase();
+                    return /muat ulang|reload|pindai ulang|click to reload/i.test(text);
+                });
+            if (btn && typeof btn.click === 'function') {
+                btn.click();
+            } else {
+                const qr = document.querySelector('div[data-testid="qrcode"], canvas, [data-ref]');
+                if (qr && typeof qr.click === 'function') qr.click();
+            }
+        }).catch(() => {});
+        await sessionData.page.waitForTimeout(800);
+        res.json({
+            success: true,
+            status: sessionData.status,
+            qr: sessionData.qrDataUrl,
+            message: 'Permintaan reload QR berhasil dijalankan.'
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
+app.post('/sessions/:sessionId/reload-qr', handleReloadQr);
+app.get('/sessions/:sessionId/reload-qr', handleReloadQr);
 
 /**
  * Send outbound message via Playwright (Humanized typing on WhatsApp Web)

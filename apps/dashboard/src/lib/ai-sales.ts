@@ -494,9 +494,9 @@ function searchCatalogForItem(queryText: string, catalogItems: any[]): any[] {
       else if (skuLower.length >= 4 && skuLower.includes(t)) score += 400;
 
       // Safe word matching - DO NOT allow arbitrary substrings across words (e.g. 'niat' in 'miniature')
-      if (wordsInName.some((w) => w === t)) {
+      if (wordsInName.some((w: string) => w === t)) {
         score += 800;
-      } else if (t.length >= 3 && wordsInName.some((w) => w.startsWith(t))) {
+      } else if (t.length >= 3 && wordsInName.some((w: string) => w.startsWith(t))) {
         score += 350;
       }
 
@@ -506,7 +506,7 @@ function searchCatalogForItem(queryText: string, catalogItems: any[]): any[] {
     if (modelKeywords.length > 0) {
       let matchedModel = false;
       for (const mk of modelKeywords) {
-        if (wordsInName.some((w) => w === mk || w.startsWith(mk)) || fullText.includes(mk)) {
+        if (wordsInName.some((w: string) => w === mk || w.startsWith(mk)) || fullText.includes(mk)) {
           score += 5000;
           matchedModel = true;
         }

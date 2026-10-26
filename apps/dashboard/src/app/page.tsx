@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   MessageSquare,
   Users,
@@ -588,7 +588,7 @@ function InboxPage({
   onSelectPhone?: (phone: string | null) => void;
   onRefresh?: () => void;
 }) {
-  const PLAYWRIGHT_URL = "http://localhost:3001";
+  const PLAYWRIGHT_URL = process.env.NEXT_PUBLIC_PLAYWRIGHT_URL || "/api/playwright";
   const [selectedConv, setSelectedConv] = useState(0);
   const [inputText, setInputText] = useState("");
   const [sending, setSending] = useState(false);
@@ -4184,7 +4184,7 @@ function PlaywrightConnectPage({ onNavigate }: { onNavigate?: (page: string) => 
 
             {/* QR Card Container */}
             <div className="flex flex-col sm:flex-row items-center gap-6 justify-center p-6 bg-slate-50/70 rounded-2xl border border-slate-100">
-              <div className="w-56 h-56 rounded-2xl bg-white p-3 border border-slate-200 shadow-sm flex items-center justify-center relative overflow-hidden group">
+              <div className="w-64 h-64 sm:w-72 sm:h-72 rounded-2xl bg-white p-4 border border-slate-200 shadow-sm flex items-center justify-center relative overflow-hidden group">
                 {sessionStatus === "connected" ? (
                   <div className="text-center p-4 space-y-3">
                     <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-2xs">
